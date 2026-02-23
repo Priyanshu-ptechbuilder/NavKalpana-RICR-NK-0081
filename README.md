@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 📚 Academic Operations and Management Portal -- (Teacher Module – Part 1)
 
 Project Title
