@@ -1,0 +1,15 @@
+.page {
+  padding: 1.5rem;
+}
+
+.page h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  color: #1a1a1a;
+}
+
+.page p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
