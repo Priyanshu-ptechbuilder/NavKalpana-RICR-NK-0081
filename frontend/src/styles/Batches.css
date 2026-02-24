@@ -1,0 +1,166 @@
+.batches-page {
+  max-width: 900px;
+}
+
+.batches-section {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.batches-section h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+/* Create Batch Form */
+.batch-form-section .batch-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.batch-form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.batch-form input,
+.batch-form select {
+  margin-top: 0.35rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  min-width: 140px;
+}
+
+.batch-form input:focus,
+.batch-form select:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.batch-form button {
+  padding: 0.5rem 1rem;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.batch-form button:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.batch-form button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Filter */
+.batches-filter-section {
+  display: flex;
+  align-items: center;
+}
+
+.batches-filter-section label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.filter-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  min-width: 140px;
+}
+
+/* Table */
+.batches-table-section .batches-error {
+  color: #dc2626;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.batches-loading,
+.batches-empty {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.batches-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.batches-table th,
+.batches-table td {
+  border: 1px solid #e5e7eb;
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+}
+
+.batches-table th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+}
+
+.batches-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+.status-ongoing {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-completed {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.status-upcoming {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.btn-delete {
+  padding: 0.35rem 0.65rem;
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  background: #fee2e2;
+}
