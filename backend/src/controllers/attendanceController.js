@@ -23,8 +23,8 @@ const markAttendance = async (req, res) => {
       });
     }
 
-    if (!['present', 'absent'].includes(status)) {
-      return res.status(400).json({ message: 'status must be present or absent' });
+    if (!['present', 'absent', 'late'].includes(status)) {
+      return res.status(400).json({ message: 'status must be present, absent or late' });
     }
 
     const studentExists = await Student.findById(student);
@@ -54,6 +54,7 @@ const markAttendance = async (req, res) => {
       batch,
       date: normalizedDate,
       status,
+      remarks: req.body.remarks || '',
       markedBy: req.user?.id,
     });
 
@@ -61,7 +62,7 @@ const markAttendance = async (req, res) => {
     const totalClasses = await Attendance.countDocuments({ student });
     const presentCount = await Attendance.countDocuments({
       student,
-      status: 'present',
+      status: { $in: ['present', 'late'] },
     });
     const percentage =
       totalClasses > 0 ? Math.round((presentCount / totalClasses) * 100) : 0;
@@ -81,6 +82,57 @@ const markAttendance = async (req, res) => {
       });
     }
     console.error('Mark attendance error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+/**
+ * Update attendance (same day only)
+ * PUT /api/attendance/:id
+ */
+const updateAttendance = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, remarks } = req.body;
+
+    const attendance = await Attendance.findById(id);
+    if (!attendance) {
+      return res.status(404).json({ message: 'Attendance not found' });
+    }
+
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+    const recordDate = new Date(attendance.date);
+    recordDate.setUTCHours(0, 0, 0, 0);
+    if (recordDate.getTime() !== today.getTime()) {
+      return res.status(400).json({ message: 'Can only edit attendance for today' });
+    }
+
+    const tenMinsMs = 10 * 60 * 1000;
+    if (Date.now() - new Date(attendance.createdAt).getTime() > tenMinsMs) {
+      return res.status(400).json({ message: 'Edit allowed only within 10 minutes of submission' });
+    }
+
+    if (status && !['present', 'absent', 'late'].includes(status)) {
+      return res.status(400).json({ message: 'status must be present, absent or late' });
+    }
+
+    if (status) attendance.status = status;
+    if (remarks !== undefined) attendance.remarks = remarks;
+    await attendance.save();
+
+    const studentId = attendance.student.toString();
+    const totalClasses = await Attendance.countDocuments({ student: studentId });
+    const presentCount = await Attendance.countDocuments({
+      student: studentId,
+      status: { $in: ['present', 'late'] },
+    });
+    const percentage = totalClasses > 0 ? Math.round((presentCount / totalClasses) * 100) : 0;
+    await Student.findByIdAndUpdate(studentId, { attendancePercentage: percentage });
+
+    res.status(200).json({ message: 'Attendance updated', attendance });
+  } catch (error) {
+    console.error('Update attendance error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -125,4 +177,5 @@ const getAttendance = async (req, res) => {
 module.exports = {
   markAttendance,
   getAttendance,
+  updateAttendance,
 };

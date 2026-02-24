@@ -49,7 +49,7 @@ const createStudent = async (req, res) => {
  */
 const getAllStudents = async (req, res) => {
   try {
-    const { status, course, search } = req.query;
+    const { status, course, batch, search } = req.query;
 
     const filter = {};
 
@@ -59,6 +59,10 @@ const getAllStudents = async (req, res) => {
 
     if (course) {
       filter.course = course;
+    }
+
+    if (batch) {
+      filter.batch = batch;
     }
 
     if (search) {
