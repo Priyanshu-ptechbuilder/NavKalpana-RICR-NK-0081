@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 import '../styles/Page.css';
 import '../styles/Attendance.css';
@@ -18,8 +19,10 @@ function todayStr() {
 }
 
 export default function Attendance() {
+  const [searchParams] = useSearchParams();
+  const batchFromUrl = searchParams.get('batch') || '';
   const [batches, setBatches] = useState([]);
-  const [selectedBatch, setSelectedBatch] = useState('');
+  const [selectedBatch, setSelectedBatch] = useState(batchFromUrl);
   const [sessionDate, setSessionDate] = useState(todayStr());
   const [moduleFilter, setModuleFilter] = useState('all');
   const [studentSearch, setStudentSearch] = useState('');
@@ -41,6 +44,10 @@ export default function Attendance() {
     };
     fetchBatches();
   }, []);
+
+  useEffect(() => {
+    if (batchFromUrl) setSelectedBatch(batchFromUrl);
+  }, [batchFromUrl]);
 
   useEffect(() => {
     if (!selectedBatch || !sessionDate) {
