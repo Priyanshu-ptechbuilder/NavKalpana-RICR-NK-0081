@@ -12,14 +12,25 @@ const studentSchema = new mongoose.Schema({
   enrollmentId: {
     type: String,
     required: true,
+    unique: true,
   },
   course: {
     type: String,
+    required: true,
+  },
+  batch: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Batch',
+    required: true,
   },
   status: {
     type: String,
     enum: ['ongoing', 'completed'],
     default: 'ongoing',
+  },
+  attendancePercentage: {
+    type: Number,
+    default: 0,
   },
   createdAt: {
     type: Date,
