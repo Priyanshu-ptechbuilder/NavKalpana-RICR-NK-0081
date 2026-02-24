@@ -198,18 +198,37 @@ export default function Attendance() {
     });
   };
 
-  const handleExport = () => {
-    const headers = ['Student Name', 'Enrollment ID', 'Status', 'Remarks'];
+  const buildExportData = () => {
+    const headers = ['Student Name', 'Enrollment ID', 'Attendance %', 'Status', 'Remarks'];
     const rows = filteredStudents.map((s) => {
       const r = rowData[s._id] || {};
-      return [s.name, s.enrollmentId, r.status || '', r.remarks || ''];
+      const pct = s.attendancePercentage != null ? `${s.attendancePercentage}%` : '—';
+      return [s.name, s.enrollmentId, pct, r.status || '', r.remarks || ''];
     });
-    const csv = [headers.join(','), ...rows.map((row) => row.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(','))].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
+    return [headers, ...rows];
+  };
+
+  const handleExportCSV = () => {
+    const data = buildExportData();
+    const csv = data.map((row) => row.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `attendance-${selectedBatch}-${sessionDate}.csv`;
+    a.download = `attendance-${sessionDate}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportExcel = () => {
+    const data = buildExportData();
+    const BOM = '\uFEFF';
+    const csv = BOM + data.map((row) => row.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'application/vnd.ms-excel;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `attendance-${sessionDate}.xls`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -224,6 +243,9 @@ export default function Attendance() {
   return (
     <div className="page attendance-page">
       <h1>Attendance Management</h1>
+      <p className="attendance-sync-note">
+        Saved attendance updates each student’s Attendance % and syncs with Student Management and Dashboard KPIs.
+      </p>
 
       <section className="attendance-section attendance-filter-section">
         <h2>Filters</h2>
@@ -297,8 +319,11 @@ export default function Attendance() {
                 <button type="button" className="btn-secondary" onClick={() => handleBulkStatus('absent')}>
                   Mark all Absent
                 </button>
-                <button type="button" className="btn-export" onClick={handleExport}>
+                <button type="button" className="btn-export" onClick={handleExportCSV}>
                   Export CSV
+                </button>
+                <button type="button" className="btn-export" onClick={handleExportExcel}>
+                  Export Excel
                 </button>
               </div>
             </div>
