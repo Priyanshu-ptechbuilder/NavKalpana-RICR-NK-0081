@@ -4,6 +4,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const batchRoutes = require('./routes/batchRoutes');
 const authMiddleware = require('./middleware/authMiddleware');
 
 const app = express();
@@ -20,6 +21,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/batches', batchRoutes);
 
 app.get('/api/protected', authMiddleware, (req, res) => {
   res.json({
