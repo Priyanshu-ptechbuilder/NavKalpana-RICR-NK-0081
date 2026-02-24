@@ -8,16 +8,22 @@ const assignmentSchema = new mongoose.Schema({
   description: {
     type: String,
   },
-  deadline: {
+  batch: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Batch',
+    required: true,
+  },
+  dueDate: {
     type: Date,
+    required: true,
   },
-  maximumMarks: {
+  totalMarks: {
     type: Number,
+    required: true,
   },
-  status: {
-    type: String,
-    enum: ['pending', 'evaluated'],
-    default: 'pending',
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Teacher',
   },
   createdAt: {
     type: Date,
