@@ -78,12 +78,33 @@ const getDashboardStats = async (req, res) => {
       ? Math.round((studentsWithSubmission.length / totalStudents) * 100)
       : 0;
 
+    // Pending assignments for evaluation (submissions without marks)
+    const pendingForEvaluation = await Submission.countDocuments({
+      $or: [{ marksObtained: { $exists: false } }, { marksObtained: null }],
+    });
+
+    // Active courses: batches with status 'ongoing'
+    const activeCourses = await Batch.countDocuments({ status: 'ongoing' });
+
+    // Upcoming assignment deadlines (next 14 days)
+    const now = new Date();
+    const twoWeeks = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+    const upcomingDeadlines = await Assignment.find({
+      dueDate: { $gte: now, $lte: twoWeeks },
+    })
+      .sort({ dueDate: 1 })
+      .limit(5)
+      .populate('batch', 'batchName')
+      .lean();
+
     res.status(200).json({
       basicStats: {
         totalBatches,
         totalStudents,
         totalAssignments,
         totalSubmissions,
+        pendingAssignmentsForEvaluation: pendingForEvaluation,
+        activeCourses,
       },
       attendanceAnalytics: {
         averageAttendancePercentage,
@@ -93,6 +114,12 @@ const getDashboardStats = async (req, res) => {
       },
       topPerformers,
       assignmentCompletionRate,
+      upcomingDeadlines: upcomingDeadlines.map((a) => ({
+        _id: a._id,
+        title: a.title,
+        dueDate: a.dueDate,
+        batchName: a.batch?.batchName,
+      })),
     });
   } catch (error) {
     console.error('Dashboard stats error:', error);
