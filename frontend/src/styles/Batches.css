@@ -68,19 +68,38 @@
   cursor: not-allowed;
 }
 
-/* Filter */
-.batches-filter-section {
-  display: flex;
-  align-items: center;
+/* Filter tabs */
+.batches-filter-section h2 {
+  margin-bottom: 0.75rem;
 }
 
-.batches-filter-section label {
+.batch-tabs {
   display: flex;
-  align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.batch-tab {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  border-radius: 8px;
   font-size: 0.95rem;
   font-weight: 500;
-  color: #374151;
+  color: #64748b;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.batch-tab:hover {
+  background: #f8fafc;
+  color: #334155;
+}
+
+.batch-tab.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
 }
 
 .filter-select {
@@ -91,8 +110,8 @@
   min-width: 140px;
 }
 
-/* Table */
-.batches-table-section .batches-error {
+/* Cards */
+.batches-cards-section .batches-error {
   color: #dc2626;
   font-size: 0.9rem;
   margin-bottom: 0.75rem;
@@ -100,32 +119,126 @@
 
 .batches-loading,
 .batches-empty {
-  color: #6b7280;
+  color: #64748b;
   font-size: 0.95rem;
   margin: 0;
 }
 
-.batches-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
+.batch-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
 }
 
-.batches-table th,
-.batches-table td {
-  border: 1px solid #e5e7eb;
-  padding: 0.65rem 0.75rem;
-  text-align: left;
+.batch-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s, transform 0.2s;
 }
 
-.batches-table th {
-  background: #f9fafb;
+.batch-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.batch-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.batch-card-name {
+  margin: 0;
+  font-size: 1.1rem;
   font-weight: 600;
-  color: #374151;
+  color: #1e293b;
 }
 
-.batches-table tbody tr:hover {
-  background: #f9fafb;
+.batch-card-type {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.batch-card-meta {
+  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+  color: #334155;
+}
+
+.batch-progress-wrap {
+  margin-bottom: 1rem;
+}
+
+.batch-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-bottom: 0.35rem;
+}
+
+.batch-progress-bar {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.batch-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.batch-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.btn-manage {
+  padding: 0.4rem 0.75rem;
+  background: #2563eb;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.btn-manage:hover {
+  background: #1d4ed8;
+}
+
+.btn-end {
+  padding: 0.4rem 0.75rem;
+  background: #059669;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-end:hover:not(:disabled) {
+  background: #047857;
+}
+
+.btn-end:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .status-badge {

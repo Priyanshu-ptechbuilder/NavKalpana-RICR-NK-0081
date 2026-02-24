@@ -1,24 +1,32 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 import '../styles/Page.css';
 import '../styles/Batches.css';
+
+const STATUS_TABS = [
+  { value: 'ongoing', label: 'Ongoing' },
+  { value: 'completed', label: 'Completed' },
+  { value: 'upcoming', label: 'Upcoming' },
+];
 
 export default function Batches() {
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState('ongoing');
   const [form, setForm] = useState({
     batchName: '',
-    batchType: '',
+    batchType: 'WEB Batch',
     status: 'ongoing',
   });
   const [submitting, setSubmitting] = useState(false);
+  const [endingId, setEndingId] = useState(null);
 
   const fetchBatches = async () => {
     setError('');
     try {
-      const params = filter === 'all' ? {} : { status: filter };
+      const params = { status: filter };
       const { data } = await axiosInstance.get('/batches', { params });
       setBatches(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -45,13 +53,28 @@ export default function Batches() {
         batchType: form.batchType.trim(),
         status: form.status,
       });
-      setForm({ batchName: '', batchType: '', status: 'ongoing' });
+      setForm({ batchName: '', batchType: 'WEB Batch', status: 'ongoing' });
       fetchBatches();
     } catch (err) {
       console.error('Create batch error:', err);
       setError(err.response?.data?.message || 'Failed to create batch');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleEndBatch = async (id) => {
+    if (!window.confirm('Mark this batch as Completed?')) return;
+    setError('');
+    setEndingId(id);
+    try {
+      await axiosInstance.put(`/batches/${id}`, { status: 'completed' });
+      fetchBatches();
+    } catch (err) {
+      console.error('End batch error:', err);
+      setError(err.response?.data?.message || 'Failed to update batch');
+    } finally {
+      setEndingId(null);
     }
   };
 
@@ -71,7 +94,6 @@ export default function Batches() {
     <div className="page batches-page">
       <h1>Batch Management</h1>
 
-      {/* Section 1: Create Batch Form */}
       <section className="batches-section batch-form-section">
         <h2>Create Batch</h2>
         <form onSubmit={handleSubmit} className="batch-form">
@@ -91,7 +113,7 @@ export default function Batches() {
               type="text"
               value={form.batchType}
               onChange={(e) => setForm((f) => ({ ...f, batchType: e.target.value }))}
-              placeholder="e.g. regular"
+              placeholder="e.g. WEB Batch, DSA Batch"
               required
             />
           </label>
@@ -112,64 +134,82 @@ export default function Batches() {
         </form>
       </section>
 
-      {/* Section 2: Filter */}
       <section className="batches-section batches-filter-section">
-        <label>
-          Filter by status
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All</option>
-            <option value="ongoing">Ongoing</option>
-            <option value="completed">Completed</option>
-            <option value="upcoming">Upcoming</option>
-          </select>
-        </label>
+        <h2>Batches</h2>
+        <div className="batch-tabs">
+          {STATUS_TABS.map((tab) => (
+            <button
+              key={tab.value}
+              type="button"
+              className={`batch-tab ${filter === tab.value ? 'active' : ''}`}
+              onClick={() => setFilter(tab.value)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </section>
 
-      {/* Section 3: Table */}
-      <section className="batches-section batches-table-section">
-        <h2>Batch List</h2>
+      <section className="batches-section batches-cards-section">
         {error && <p className="batches-error">{error}</p>}
         {loading ? (
           <p className="batches-loading">Loading batches...</p>
         ) : batches.length === 0 ? (
-          <p className="batches-empty">No batches found.</p>
+          <p className="batches-empty">No batches in this category.</p>
         ) : (
-          <table className="batches-table">
-            <thead>
-              <tr>
-                <th>Batch Name</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {batches.map((batch) => (
-                <tr key={batch._id}>
-                  <td>{batch.batchName}</td>
-                  <td>{batch.batchType}</td>
-                  <td>
-                    <span className={`status-badge status-${batch.status}`}>
-                      {batch.status}
-                    </span>
-                  </td>
-                  <td>
+          <div className="batch-cards-grid">
+            {batches.map((batch) => (
+              <div key={batch._id} className="batch-card">
+                <div className="batch-card-header">
+                  <h3 className="batch-card-name">{batch.batchName}</h3>
+                  <span className={`status-badge status-${batch.status}`}>
+                    {batch.status}
+                  </span>
+                </div>
+                <p className="batch-card-type">{batch.batchType}</p>
+                <p className="batch-card-meta">
+                  Total Students: <strong>{batch.totalStudents ?? 0}</strong>
+                </p>
+                <div className="batch-progress-wrap">
+                  <div className="batch-progress-label">
+                    <span>Progress</span>
+                    <span>{batch.progress ?? 0}%</span>
+                  </div>
+                  <div className="batch-progress-bar">
+                    <div
+                      className="batch-progress-fill"
+                      style={{ width: `${Math.min(100, Math.max(0, batch.progress ?? 0))}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="batch-card-actions">
+                  <Link
+                    to={`/attendance?batch=${batch._id}`}
+                    className="btn-manage"
+                  >
+                    Manage
+                  </Link>
+                  {batch.status === 'ongoing' && (
                     <button
                       type="button"
-                      className="btn-delete"
-                      onClick={() => handleDelete(batch._id)}
+                      className="btn-end"
+                      onClick={() => handleEndBatch(batch._id)}
+                      disabled={endingId === batch._id}
                     >
-                      Delete
+                      {endingId === batch._id ? 'Ending...' : 'End'}
                     </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  )}
+                  <button
+                    type="button"
+                    className="btn-delete"
+                    onClick={() => handleDelete(batch._id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </section>
     </div>
