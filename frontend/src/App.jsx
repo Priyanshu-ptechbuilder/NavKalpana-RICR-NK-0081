@@ -7,6 +7,7 @@ import Batches from './pages/Batches';
 import Students from './pages/Students';
 import Attendance from './pages/Attendance';
 import Assignments from './pages/Assignments';
+import Quizzes from './pages/Quizzes';
 import './styles/App.css';
 
 function AppLayout({ children }) {
@@ -30,6 +31,7 @@ function AppLayout({ children }) {
           <Link to="/students">Students</Link>
           <Link to="/attendance">Attendance</Link>
           <Link to="/assignments">Assignments</Link>
+          <Link to="/quizzes">Quizzes</Link>
           <button type="button" className="logout-btn" onClick={handleLogout}>
             Logout
           </button>
@@ -97,6 +99,16 @@ export default function App() {
             <ProtectedRoute>
               <AppLayout>
                 <Assignments />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quizzes"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Quizzes />
               </AppLayout>
             </ProtectedRoute>
           }
