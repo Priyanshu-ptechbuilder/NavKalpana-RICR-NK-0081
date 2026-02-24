@@ -6,6 +6,119 @@ import '../styles/Students.css';
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PAGE_SIZE = 10;
 
+// Dummy weekly activity for modal (e.g. last 7 days)
+function getDummyWeeklyActivity() {
+  return [65, 80, 72, 90, 85, 78, 88].map((v, i) => ({
+    day: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i],
+    value: v,
+  }));
+}
+
+// Dummy module-wise completion
+function getDummyModulesCompleted(total = 5) {
+  const completed = Math.min(total, Math.floor(Math.random() * total) + 1);
+  return { completed, total };
+}
+
+function StudentDetailModal({ student, onClose }) {
+  const [activeTab, setActiveTab] = useState('course');
+  const weeklyActivity = useMemo(() => getDummyWeeklyActivity(), []);
+  const modules = useMemo(() => getDummyModulesCompleted(6), []);
+
+  if (!student) return null;
+
+  const pct = student.attendancePercentage ?? 0;
+  const attendanceBadge =
+    pct > 75 ? 'High' : pct >= 50 ? 'Medium' : 'Low';
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="student-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="student-modal-header">
+          <div className="student-modal-title-row">
+            <div className="student-modal-avatar large">
+              {(student.name?.[0] || 'S').toUpperCase()}
+            </div>
+            <div>
+              <h2>{student.name}</h2>
+              <p className="student-modal-meta">
+                {student.course} · {student.enrollmentId}
+              </p>
+              <div className="student-modal-badges">
+                <span className={`status-badge status-${student.status || 'ongoing'}`}>
+                  {student.status || 'ongoing'}
+                </span>
+                <span className={`attendance-pct ${pct > 75 ? 'attendance-high' : pct >= 50 ? 'attendance-mid' : 'attendance-low'}`}>
+                  Attendance: {attendanceBadge}
+                </span>
+              </div>
+            </div>
+          </div>
+          <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
+            ×
+          </button>
+        </div>
+
+        <div className="student-modal-tabs">
+          {['course', 'progress', 'attendance'].map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              className={`student-modal-tab ${activeTab === tab ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab === 'course' && 'Course Information'}
+              {tab === 'progress' && 'Progress'}
+              {tab === 'attendance' && 'Attendance'}
+            </button>
+          ))}
+        </div>
+
+        <div className="student-modal-body">
+          {activeTab === 'course' && (
+            <div className="student-modal-panel">
+              <p><strong>Current Course:</strong> {student.course}</p>
+              <p><strong>Enrollment Number:</strong> {student.enrollmentId}</p>
+              <div className="weekly-activity-chart">
+                <h4>Weekly Activity</h4>
+                <div className="chart-bars">
+                  {weeklyActivity.map((d) => (
+                    <div key={d.day} className="chart-bar-wrap">
+                      <div className="chart-bar" style={{ height: `${d.value}%` }} title={`${d.value}%`} />
+                      <span className="chart-label">{d.day}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <p><strong>Modules:</strong> {modules.completed} / {modules.total} completed</p>
+              <p><strong>Skills Acquired:</strong> React, Node.js, MongoDB (sample)</p>
+              <p><strong>Learning Streak:</strong> 5 days (sample)</p>
+              <p><strong>Attendance Summary:</strong> {pct}% overall</p>
+            </div>
+          )}
+
+          {activeTab === 'progress' && (
+            <div className="student-modal-panel">
+              <p><strong>Module-wise completion:</strong> {modules.completed} / {modules.total} modules</p>
+              <p><strong>Assignment summary:</strong> Sample — 8 submitted, 7 evaluated</p>
+              <p><strong>Quiz summary:</strong> Sample — 5 attempted, avg 82%</p>
+              <p><strong>Overall Progress:</strong> {Math.round((modules.completed / modules.total) * 100)}%</p>
+            </div>
+          )}
+
+          {activeTab === 'attendance' && (
+            <div className="student-modal-panel">
+              <p><strong>Overall Attendance:</strong> {pct}%</p>
+              <p><strong>Total Present / Absent / Late:</strong> Sample — 45 / 3 / 2</p>
+              <p className="text-muted">Calendar view and module-wise stats can be wired to attendance API.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Students() {
   const [students, setStudents] = useState([]);
   const [batches, setBatches] = useState([]);
@@ -26,6 +139,7 @@ export default function Students() {
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState('asc');
   const [currentPage, setCurrentPage] = useState(1);
+  const [detailStudent, setDetailStudent] = useState(null);
 
   const fetchBatches = async () => {
     try {
@@ -99,11 +213,13 @@ export default function Students() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (e, id) => {
+    e.stopPropagation();
     if (!window.confirm('Are you sure you want to delete this student?')) return;
     setError('');
     try {
       await axiosInstance.delete(`/students/${id}`);
+      setDetailStudent(null);
       fetchStudents();
     } catch (err) {
       console.error('Delete student error:', err);
@@ -134,6 +250,9 @@ export default function Students() {
     return list;
   }, [students, sortBy, sortOrder]);
 
+  const ongoingCount = useMemo(() => students.filter((s) => (s.status || 'ongoing') === 'ongoing').length, [students]);
+  const completedCount = useMemo(() => students.filter((s) => s.status === 'completed').length, [students]);
+
   const totalPages = Math.ceil(sortedStudents.length / PAGE_SIZE) || 1;
   const paginatedStudents = useMemo(() => {
     const start = (currentPage - 1) * PAGE_SIZE;
@@ -151,9 +270,31 @@ export default function Students() {
     return 'attendance-low';
   };
 
+  const getEnrolledModules = (s) => {
+    const tags = [];
+    if (s.course) tags.push(s.course);
+    if (s.batch?.batchName) tags.push(s.batch.batchName);
+    return tags.length ? tags : ['—'];
+  };
+
   return (
     <div className="page students-page">
       <h1>Student Management</h1>
+
+      <section className="students-summary-cards">
+        <div className="summary-card">
+          <span className="summary-value">{students.length}</span>
+          <span className="summary-label">Total Students</span>
+        </div>
+        <div className="summary-card ongoing">
+          <span className="summary-value">{ongoingCount}</span>
+          <span className="summary-label">Ongoing</span>
+        </div>
+        <div className="summary-card completed">
+          <span className="summary-value">{completedCount}</span>
+          <span className="summary-label">Completed</span>
+        </div>
+      </section>
 
       <section className="students-section student-form-section">
         <h2>Create Student</h2>
@@ -250,7 +391,7 @@ export default function Students() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Name, email, or enrollment ID"
+              placeholder="Name, Enrollment ID, Email, or Course"
               className="filter-input search-input"
             />
           </label>
@@ -291,39 +432,55 @@ export default function Students() {
               <table className="students-table">
                 <thead>
                   <tr>
+                    <th></th>
                     <th>Name</th>
-                    <th>Email</th>
                     <th>Enrollment ID</th>
                     <th>Course</th>
-                    <th>Batch Name</th>
-                    <th>Status</th>
+                    <th>Enrolled Modules</th>
                     <th>Attendance %</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>GitHub / LinkedIn</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedStudents.map((s) => (
-                    <tr key={s._id}>
-                      <td>{s.name}</td>
-                      <td>{s.email}</td>
+                    <tr key={s._id} className="student-row-clickable" onClick={() => setDetailStudent(s)}>
+                      <td>
+                        <div className="student-avatar">
+                          {(s.name?.[0] || 'S').toUpperCase()}
+                        </div>
+                      </td>
+                      <td><strong>{s.name}</strong></td>
                       <td>{s.enrollmentId}</td>
                       <td>{s.course}</td>
-                      <td>{s.batch?.batchName ?? '—'}</td>
                       <td>
-                        <span className={`status-badge status-${s.status || 'ongoing'}`}>
-                          {s.status || 'ongoing'}
-                        </span>
+                        <div className="module-tags">
+                          {getEnrolledModules(s).map((tag) => (
+                            <span key={tag} className="module-tag">{tag}</span>
+                          ))}
+                        </div>
                       </td>
                       <td>
                         <span className={`attendance-pct ${getAttendanceClass(s.attendancePercentage)}`}>
                           {s.attendancePercentage != null ? `${s.attendancePercentage}%` : '—'}
                         </span>
                       </td>
+                      <td>{s.email}</td>
+                      <td>{s.phone || '—'}</td>
+                      <td>
+                        <span className="social-links">
+                          {s.github ? <a href={s.github} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>GitHub</a> : '—'}
+                          {' / '}
+                          {s.linkedIn ? <a href={s.linkedIn} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>LinkedIn</a> : '—'}
+                        </span>
+                      </td>
                       <td>
                         <button
                           type="button"
                           className="btn-delete"
-                          onClick={() => handleDelete(s._id)}
+                          onClick={(e) => handleDelete(e, s._id)}
                         >
                           Delete
                         </button>
@@ -357,6 +514,13 @@ export default function Students() {
           </>
         )}
       </section>
+
+      {detailStudent && (
+        <StudentDetailModal
+          student={detailStudent}
+          onClose={() => setDetailStudent(null)}
+        />
+      )}
     </div>
   );
 }

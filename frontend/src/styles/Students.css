@@ -1,5 +1,42 @@
 .students-page {
-  max-width: 1100px;
+  max-width: 1200px;
+}
+
+.students-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #2563eb;
+}
+
+.summary-card.ongoing {
+  border-left-color: #059669;
+}
+
+.summary-card.completed {
+  border-left-color: #64748b;
+}
+
+.summary-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.summary-label {
+  display: block;
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 0.25rem;
 }
 
 .students-section {
@@ -174,6 +211,216 @@
 
 .students-table tbody tr:hover {
   background: #f9fafb;
+}
+
+.student-row-clickable {
+  cursor: pointer;
+}
+
+.student-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.module-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.module-tag {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  background: #e0e7ff;
+  color: #3730a3;
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.social-links a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.social-links a:hover {
+  text-decoration: underline;
+}
+
+/* Student Detail Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.student-modal {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 560px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.student-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.student-modal-title-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.student-modal-avatar.large {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.student-modal-header h2 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.25rem;
+  color: #1e293b;
+}
+
+.student-modal-meta {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.student-modal-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: #1e293b;
+}
+
+.student-modal-tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.75rem 1.5rem 0;
+  border-bottom: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+.student-modal-tab {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: none;
+  font-size: 0.9rem;
+  color: #64748b;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.student-modal-tab:hover {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.student-modal-tab.active {
+  background: #2563eb;
+  color: #fff;
+}
+
+.student-modal-body {
+  padding: 1.25rem 1.5rem;
+  overflow: auto;
+}
+
+.student-modal-panel p {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+.student-modal-panel .text-muted {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.weekly-activity-chart {
+  margin: 1rem 0;
+}
+
+.weekly-activity-chart h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+.chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  height: 120px;
+}
+
+.chart-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chart-bar {
+  width: 100%;
+  max-width: 28px;
+  min-height: 4px;
+  background: linear-gradient(180deg, #2563eb 0%, #60a5fa 100%);
+  border-radius: 4px 4px 0 0;
+  transition: height 0.3s ease;
+}
+
+.chart-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.35rem;
 }
 
 .status-badge {
