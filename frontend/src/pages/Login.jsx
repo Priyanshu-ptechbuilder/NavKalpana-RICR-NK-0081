@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate, Link } from 'react-router-dom';
+import axiosInstance from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Login.css';
 
@@ -17,7 +17,7 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const { data } = await axios.post('http://localhost:5000/api/auth/login', {
+      const { data } = await axiosInstance.post('/auth/login', {
         email,
         password,
       });
@@ -45,6 +45,7 @@ export default function Login() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
+              placeholder="email@example.com"
             />
           </label>
           <label>
@@ -55,12 +56,16 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
               autoComplete="current-password"
+              placeholder="Your password"
             />
           </label>
           <button type="submit" disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
+        <p className="auth-switch">
+          Don&apos;t have an account? <Link to="/register">Register</Link>
+        </p>
       </div>
     </div>
   );
