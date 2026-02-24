@@ -8,6 +8,14 @@ const assignmentSchema = new mongoose.Schema({
   description: {
     type: String,
   },
+  lesson: {
+    type: String,
+    default: '',
+  },
+  submissionType: {
+    type: String,
+    default: 'PDF',
+  },
   batch: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Batch',

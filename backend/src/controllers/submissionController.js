@@ -69,7 +69,7 @@ const getSubmissions = async (req, res) => {
 
     const submissions = await Submission.find(filter)
       .populate('student', 'name enrollmentId')
-      .populate('assignment', 'title')
+      .populate('assignment', 'title dueDate totalMarks')
       .sort({ submittedAt: -1 });
 
     res.status(200).json(submissions);
@@ -79,7 +79,36 @@ const getSubmissions = async (req, res) => {
   }
 };
 
+/**
+ * Update submission (marks, feedback)
+ * PUT /api/submissions/:id
+ */
+const updateSubmission = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { marksObtained, feedback } = req.body;
+
+    const submission = await Submission.findByIdAndUpdate(
+      id,
+      { $set: { marksObtained: marksObtained !== undefined ? Number(marksObtained) : undefined, feedback: feedback || '' } },
+      { new: true }
+    )
+      .populate('student', 'name enrollmentId')
+      .populate('assignment', 'title dueDate totalMarks');
+
+    if (!submission) {
+      return res.status(404).json({ message: 'Submission not found' });
+    }
+
+    res.status(200).json({ message: 'Submission updated', submission });
+  } catch (error) {
+    console.error('Update submission error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
   createSubmission,
   getSubmissions,
+  updateSubmission,
 };

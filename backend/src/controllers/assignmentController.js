@@ -7,7 +7,7 @@ const Batch = require('../models/Batch');
  */
 const createAssignment = async (req, res) => {
   try {
-    const { title, description, batch, dueDate, totalMarks } = req.body;
+    const { title, description, lesson, submissionType, batch, dueDate, totalMarks } = req.body;
 
     if (!title || !batch || !dueDate || totalMarks === undefined) {
       return res.status(400).json({
@@ -23,6 +23,8 @@ const createAssignment = async (req, res) => {
     const assignment = await Assignment.create({
       title,
       description: description || '',
+      lesson: lesson || '',
+      submissionType: submissionType || 'PDF',
       batch,
       dueDate,
       totalMarks: Number(totalMarks),
@@ -45,12 +47,11 @@ const createAssignment = async (req, res) => {
  */
 const getAssignments = async (req, res) => {
   try {
-    const { batch } = req.query;
+    const { batch, lesson } = req.query;
 
     const filter = {};
-    if (batch) {
-      filter.batch = batch;
-    }
+    if (batch) filter.batch = batch;
+    if (lesson) filter.lesson = lesson;
 
     const assignments = await Assignment.find(filter)
       .populate('batch', 'batchName _id')
