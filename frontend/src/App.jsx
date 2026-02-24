@@ -1,7 +1,9 @@
-import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import AppLayout from './components/Layout/AppLayout';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Batches from './pages/Batches';
 import Students from './pages/Students';
@@ -12,44 +14,16 @@ import Analytics from './pages/Analytics';
 import Support from './pages/Support';
 import './styles/App.css';
 
-function AppLayout({ children }) {
-  const { token, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login', { replace: true });
-  };
-
-  if (!token) return children;
-
-  return (
-    <div className="app-layout">
-      <nav className="app-nav">
-        <span className="brand">Academic Portal</span>
-        <div className="nav-links">
-          <Link to="/dashboard">Dashboard</Link>
-          <Link to="/batches">Batches</Link>
-          <Link to="/students">Students</Link>
-          <Link to="/attendance">Attendance</Link>
-          <Link to="/assignments">Assignments</Link>
-          <Link to="/quizzes">Quizzes</Link>
-          <Link to="/analytics">Analytics</Link>
-          <Link to="/support">Support</Link>
-          <button type="button" className="logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
-      </nav>
-      <main className="app-main">{children}</main>
-    </div>
-  );
-}
-
 function LoginRoute() {
   const { token } = useAuth();
   if (token) return <Navigate to="/dashboard" replace />;
   return <Login />;
+}
+
+function RegisterRoute() {
+  const { token } = useAuth();
+  if (token) return <Navigate to="/dashboard" replace />;
+  return <Register />;
 }
 
 export default function App() {
@@ -57,6 +31,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginRoute />} />
+        <Route path="/register" element={<RegisterRoute />} />
         <Route
           path="/dashboard"
           element={
