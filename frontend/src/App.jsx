@@ -12,6 +12,7 @@ import Assignments from './pages/Assignments';
 import Quizzes from './pages/Quizzes';
 import Analytics from './pages/Analytics';
 import Support from './pages/Support';
+import Profile from './pages/Profile';
 import './styles/App.css';
 
 function LoginRoute() {
@@ -108,6 +109,16 @@ export default function App() {
             <ProtectedRoute>
               <AppLayout>
                 <Support />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Profile />
               </AppLayout>
             </ProtectedRoute>
           }

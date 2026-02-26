@@ -79,7 +79,75 @@ const loginTeacher = async (req, res) => {
   }
 };
 
+// Get current teacher profile (protected)
+const getMe = async (req, res) => {
+  try {
+    const teacher = await Teacher.findById(req.user.id).select('-password');
+    if (!teacher) {
+      return res.status(404).json({ message: 'Teacher not found' });
+    }
+    res.status(200).json({
+      teacher: {
+        id: teacher._id,
+        name: teacher.name,
+        email: teacher.email,
+        role: teacher.role,
+      },
+    });
+  } catch (error) {
+    console.error('Get me error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Update profile (name, email, optional password change)
+const updateProfile = async (req, res) => {
+  try {
+    const { name, email, currentPassword, newPassword } = req.body;
+    const teacher = await Teacher.findById(req.user.id);
+    if (!teacher) {
+      return res.status(404).json({ message: 'Teacher not found' });
+    }
+
+    if (name != null && name.trim()) teacher.name = name.trim();
+    if (email != null && email.trim()) {
+      const existing = await Teacher.findOne({ email: email.trim(), _id: { $ne: teacher._id } });
+      if (existing) {
+        return res.status(400).json({ message: 'Email already in use by another account' });
+      }
+      teacher.email = email.trim();
+    }
+
+    if (newPassword != null && newPassword.trim()) {
+      if (!currentPassword) {
+        return res.status(400).json({ message: 'Current password is required to set a new password' });
+      }
+      const isMatch = await bcrypt.compare(currentPassword, teacher.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Current password is incorrect' });
+      }
+      teacher.password = await bcrypt.hash(newPassword.trim(), 10);
+    }
+
+    await teacher.save();
+    res.status(200).json({
+      message: 'Profile updated successfully',
+      teacher: {
+        id: teacher._id,
+        name: teacher.name,
+        email: teacher.email,
+        role: teacher.role,
+      },
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
   registerTeacher,
   loginTeacher,
+  getMe,
+  updateProfile,
 };

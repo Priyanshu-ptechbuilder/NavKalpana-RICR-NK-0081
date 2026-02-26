@@ -58,7 +58,14 @@ export default function TopBar() {
                 </div>
               </div>
               <div className="dropdown-divider" />
-              <button type="button" className="dropdown-item" onClick={() => { setDropdownOpen(false); }}>
+              <button
+                type="button"
+                className="dropdown-item"
+                onClick={() => {
+                  setDropdownOpen(false);
+                  navigate('/profile');
+                }}
+              >
                 Profile
               </button>
               <button type="button" className="dropdown-item logout" onClick={handleLogout}>
