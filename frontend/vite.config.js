@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'https://navkalpana-ricr-nk-0081-lkkv.onrender.com',
         changeOrigin: true,
       },
     },
