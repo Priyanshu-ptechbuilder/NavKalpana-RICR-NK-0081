@@ -1,9 +1,13 @@
 # Environment variables (secrets)
 .env
-.env.local
-
-.env
 .env.*
 
 # Dependencies
 node_modules/
+
+# Build folders
+dist/
+build/
+
+# Logs
+npm-debug.log*
