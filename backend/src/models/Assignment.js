@@ -37,6 +37,20 @@ const assignmentSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  submissions: [
+    {
+      studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student' },
+      fileUrl: String,
+      submittedAt: Date,
+      marks: Number,
+      feedback: String,
+      status: {
+        type: String,
+        enum: ["Not Submitted", "Submitted", "Late", "Evaluated"],
+        default: "Submitted"
+      }
+    }
+  ]
 });
 
 module.exports = mongoose.model('Assignment', assignmentSchema);

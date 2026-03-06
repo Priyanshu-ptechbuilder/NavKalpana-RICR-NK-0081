@@ -114,12 +114,16 @@ export default function Dashboard() {
 
       {data.topPerformers?.length > 0 && (
         <section className="dashboard-section top-performers-section">
-          <h2>Top Performers</h2>
+          <h2>Leaderboard (Top 5)</h2>
           <ul className="top-performers-list">
-            {data.topPerformers.map((p, i) => (
-              <li key={p.studentId || i}>
-                <span className="tp-name">{p.name}</span>
-                <span className="tp-marks">{p.averageMarks} avg</span>
+            {data.topPerformers.map((p) => (
+              <li key={p.studentId || p.enrollmentId} className="top-performer-item">
+                <div className="tp-rank">#{p.ranking || 'N/A'}</div>
+                <div className="tp-info">
+                    <span className="tp-name">{p.name}</span>
+                    <span className="tp-id">{p.enrollmentId}</span>
+                </div>
+                <span className="tp-marks">{p.averageMarks} OGI</span>
               </li>
             ))}
           </ul>

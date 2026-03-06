@@ -1,6 +1,7 @@
 const QuizAttempt = require('../models/QuizAttempt');
 const Quiz = require('../models/Quiz');
 const Student = require('../models/Student');
+const calculateOGI = require('../utils/calculateOGI');
 
 const submitAttempt = async (req, res) => {
   try {
@@ -33,6 +34,22 @@ const submitAttempt = async (req, res) => {
       totalMarks: totalMarks || quizDoc.totalMarks,
       answers,
     });
+
+    // Mirror to Quiz.attempts array
+    await Quiz.findByIdAndUpdate(quiz, {
+      $push: {
+        attempts: {
+          studentId: student,
+          score,
+          answers,
+          attemptedAt: new Date()
+        }
+      }
+    });
+
+    // Recalculate OGI
+    await calculateOGI(student);
+
     res.status(201).json({ message: 'Attempt submitted', attempt });
   } catch (error) {
     console.error('Submit attempt error:', error);

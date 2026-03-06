@@ -1,6 +1,7 @@
 const Submission = require('../models/Submission');
 const Student = require('../models/Student');
 const Assignment = require('../models/Assignment');
+const calculateOGI = require('../utils/calculateOGI');
 
 /**
  * Create a new submission (evaluate / record marks)
@@ -35,10 +36,27 @@ const createSubmission = async (req, res) => {
 
     const submission = await Submission.create({
       student,
-      assignment,
+      assignment: assignment,
       marksObtained: marksObtained !== undefined ? Number(marksObtained) : undefined,
       feedback: feedback || '',
     });
+
+    // Mirror to Assignment.submissions array
+    await Assignment.findByIdAndUpdate(assignment, {
+      $push: {
+        submissions: {
+          studentId: student,
+          fileUrl: req.body.fileUrl || '',
+          submittedAt: new Date(),
+          marks: marksObtained !== undefined ? Number(marksObtained) : 0,
+          feedback: feedback || '',
+          status: "Evaluated" // Since it's being created/evaluated via teacher controller
+        }
+      }
+    });
+
+    // Recalculate OGI
+    await calculateOGI(student);
 
     res.status(201).json({
       message: 'Submission saved successfully',
@@ -99,6 +117,21 @@ const updateSubmission = async (req, res) => {
     if (!submission) {
       return res.status(404).json({ message: 'Submission not found' });
     }
+
+    // Update mirror in Assignment.submissions array
+    await Assignment.updateOne(
+      { _id: submission.assignment._id, "submissions.studentId": submission.student._id },
+      {
+        $set: {
+          "submissions.$.marks": marksObtained !== undefined ? Number(marksObtained) : submission.marksObtained,
+          "submissions.$.feedback": feedback || submission.feedback,
+          "submissions.$.status": "Evaluated"
+        }
+      }
+    );
+
+    // Recalculate OGI
+    await calculateOGI(submission.student._id);
 
     res.status(200).json({ message: 'Submission updated', submission });
   } catch (error) {

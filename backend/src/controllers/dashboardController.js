@@ -35,41 +35,19 @@ const getDashboardStats = async (req, res) => {
       ? Math.round(marksResult[0].avg)
       : 0;
 
-    // Top 5 students by average marks (aggregation)
-    const topPerformersAgg = await Submission.aggregate([
-      { $match: { marksObtained: { $exists: true, $ne: null } } },
-      {
-        $group: {
-          _id: '$student',
-          averageMarks: { $avg: '$marksObtained' },
-        },
-      },
-      { $sort: { averageMarks: -1 } },
-      { $limit: 5 },
-      {
-        $lookup: {
-          from: 'students',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'studentDoc',
-        },
-      },
-      { $unwind: '$studentDoc' },
-      {
-        $project: {
-          studentId: '$_id',
-          name: '$studentDoc.name',
-          enrollmentId: '$studentDoc.enrollmentId',
-          averageMarks: { $round: ['$averageMarks', 0] },
-        },
-      },
-    ]);
+    // Top 5 students by OGI (Leaderboard)
+    const performers = await Student.find()
+      .sort({ OGI: -1 })
+      .limit(5)
+      .select('name enrollmentId OGI ranking')
+      .lean();
 
-    const topPerformers = topPerformersAgg.map((p) => ({
-      studentId: p.studentId,
+    const topPerformers = performers.map(p => ({
+      studentId: p._id,
       name: p.name,
       enrollmentId: p.enrollmentId,
-      averageMarks: p.averageMarks,
+      averageMarks: p.OGI, // Map OGI as the performance metric
+      ranking: p.ranking
     }));
 
     // Assignment completion rate: % of students who have at least one submission

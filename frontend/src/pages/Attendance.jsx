@@ -250,9 +250,6 @@ export default function Attendance() {
   return (
     <div className="page attendance-page">
       <h1>Attendance Management</h1>
-      <p className="attendance-sync-note">
-        Saved attendance updates each student’s Attendance % and syncs with Student Management and Dashboard KPIs.
-      </p>
 
       <section className="attendance-section attendance-filter-section">
         <h2>Filters</h2>

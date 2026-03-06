@@ -1,6 +1,7 @@
 const Attendance = require('../models/Attendance');
 const Student = require('../models/Student');
 const Batch = require('../models/Batch');
+const calculateOGI = require('../utils/calculateOGI');
 
 // Helper: normalize date to start of day (UTC)
 const getStartOfDay = (date) => {
@@ -71,6 +72,9 @@ const markAttendance = async (req, res) => {
       attendancePercentage: percentage,
     });
 
+    // Recalculate OGI
+    await calculateOGI(student);
+
     res.status(201).json({
       message: 'Attendance marked successfully',
       attendance,
@@ -129,6 +133,9 @@ const updateAttendance = async (req, res) => {
     });
     const percentage = totalClasses > 0 ? Math.round((presentCount / totalClasses) * 100) : 0;
     await Student.findByIdAndUpdate(studentId, { attendancePercentage: percentage });
+
+    // Recalculate OGI
+    await calculateOGI(studentId);
 
     res.status(200).json({ message: 'Attendance updated', attendance });
   } catch (error) {

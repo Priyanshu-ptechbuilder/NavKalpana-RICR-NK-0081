@@ -8,34 +8,56 @@ const studentSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
+    unique: true,
   },
   enrollmentId: {
     type: String,
     required: true,
     unique: true,
   },
-  course: {
+  password: {
     type: String,
     required: true,
   },
-  batch: {
+  role: {
+    type: String,
+    default: "student",
+  },
+  batchId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Batch',
+    ref: "Batch",
+    required: true,
+  },
+  courseId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Course",
     required: true,
   },
   status: {
     type: String,
-    enum: ['ongoing', 'completed'],
-    default: 'ongoing',
+    enum: ["ongoing", "completed"],
+    default: "ongoing",
   },
   attendancePercentage: {
     type: Number,
     default: 0,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
+  OGI: {
+    type: Number,
+    default: 0,
   },
-});
+  growthClassification: {
+    type: String,
+    default: "Stable",
+  },
+  createdByTeacherId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Teacher",
+  },
+  ranking: {
+    type: Number,
+    default: 0,
+  },
+}, { timestamps: true });
 
 module.exports = mongoose.model('Student', studentSchema);

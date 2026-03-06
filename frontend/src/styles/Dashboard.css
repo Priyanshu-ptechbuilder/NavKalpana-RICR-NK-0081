@@ -18,52 +18,54 @@
 }
 
 .kpi-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  border-left: 4px solid;
-  transition: transform 0.2s, box-shadow 0.2s;
+  background: #ffffff !important;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: 2px solid transparent;
 }
 
 .kpi-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
 }
 
 .kpi-blue {
-  border-left-color: #2563eb;
-  background: linear-gradient(135deg, #eff6ff 0%, #fff 100%);
+  background: #e0e7ff !important;
+  border-color: #4f46e5;
 }
 
 .kpi-green {
-  border-left-color: #059669;
-  background: linear-gradient(135deg, #ecfdf5 0%, #fff 100%);
+  background: #dcfce7 !important;
+  border-color: #10b981;
 }
 
 .kpi-amber {
-  border-left-color: #d97706;
-  background: linear-gradient(135deg, #fffbeb 0%, #fff 100%);
+  background: #fef3c7 !important;
+  border-color: #f59e0b;
 }
 
 .kpi-icon {
-  display: block;
-  font-size: 1.5rem;
+  font-size: 2rem;
   margin-bottom: 0.5rem;
 }
 
 .kpi-value {
-  display: block;
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1e293b;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1e293b !important;
+  margin: 0.25rem 0;
 }
 
 .kpi-title {
-  display: block;
   font-size: 0.85rem;
-  color: #64748b;
-  margin-top: 0.25rem;
+  font-weight: 700;
+  color: #475569 !important;
+  text-transform: uppercase;
 }
 
 .dashboard-grid {
@@ -87,10 +89,15 @@
 }
 
 .dashboard-section h2 {
-  margin: 0 0 1rem 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #334155;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #1e293b !important; /* Deep navy/slate for maximum visibility */
+  border-left: 5px solid #2563eb;
+  padding-left: 1.25rem;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .quick-nav-grid {
@@ -103,23 +110,25 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1rem;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  gap: 0.75rem;
+  padding: 1.25rem 1rem;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 12px;
   text-decoration: none;
-  color: #334155;
+  color: #1e293b !important; /* Dark text for navigation */
   font-size: 0.9rem;
-  font-weight: 500;
-  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .quick-nav-card:hover {
-  background: #f1f5f9;
-  border-color: #2563eb;
-  color: #2563eb;
-  transform: translateY(-2px);
+  background: #f1f5f9 !important;
+  border-color: #2563eb !important;
+  color: #2563eb !important;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .quick-nav-icon {
@@ -134,11 +143,13 @@
 
 .perf-card {
   flex: 1;
-  min-width: 120px;
-  padding: 1rem;
-  background: #f8fafc;
-  border-radius: 10px;
+  min-width: 140px;
+  padding: 1.5rem 1rem;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
   text-align: center;
+  box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.02);
 }
 
 .perf-value {
@@ -196,23 +207,60 @@
   padding: 0;
 }
 
-.top-performers-list li {
+.top-performer-item {
+  background: #f8fafc;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #f1f5f9;
+  gap: 1.25rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.top-performer-item:hover {
+  transform: translateX(8px);
+  border-color: #6366f1;
+}
+
+.tp-rank {
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: white;
+  min-width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+}
+
+.tp-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .tp-name {
-  font-weight: 500;
-  color: #334155;
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.95rem;
+}
+
+.tp-id {
+  font-size: 0.75rem;
+  color: #64748b;
 }
 
 .tp-marks {
-  font-size: 0.9rem;
+  font-weight: 700;
   color: #059669;
-  font-weight: 600;
+  background: #ecfdf5;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
 }
 
 .page-loading,

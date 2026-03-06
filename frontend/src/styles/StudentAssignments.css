@@ -1,0 +1,150 @@
+.student-assignments-page {
+  padding: 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: #f8fafc;
+}
+
+.assignments-header {
+  margin-bottom: 2.5rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.assignments-header h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.assignments-header p {
+  color: #94a3b8;
+}
+
+.assignments-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.assignment-card {
+  background: rgba(30, 41, 59, 0.4);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.assignment-card:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.assignment-info h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.assignment-meta {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+.assignment-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.status-badge {
+  padding: 0.35rem 1rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-not-submitted { background: rgba(100, 116, 139, 0.2); color: #94a3b8; }
+.status-submitted { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.status-late { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+.status-evaluated { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
+
+.evaluated-info {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.marks-display {
+  font-weight: 700;
+  color: #f8fafc;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.feedback-text {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.submit-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.75rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.success-message {
+    color: #10b981;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .assignment-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  .submit-action {
+    align-items: flex-start;
+    width: 100%;
+  }
+  .submit-btn {
+    width: 100%;
+  }
+}

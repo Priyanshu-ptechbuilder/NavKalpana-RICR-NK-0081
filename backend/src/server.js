@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
+const studentAuthRoutes = require('./routes/studentAuthRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const batchRoutes = require('./routes/batchRoutes');
 const studentRoutes = require('./routes/studentRoutes');
@@ -12,6 +13,7 @@ const submissionRoutes = require('./routes/submissionRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const quizAttemptRoutes = require('./routes/quizAttemptRoutes');
 const authMiddleware = require('./middleware/authMiddleware');
+const verifyStudentToken = require('./middleware/studentAuthMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,6 +28,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/student', studentAuthRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/batches', batchRoutes);
 app.use('/api/students', studentRoutes);
