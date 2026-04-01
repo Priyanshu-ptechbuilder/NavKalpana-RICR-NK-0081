@@ -326,7 +326,7 @@
 
 .analytics-heatmap-grid {
   display: grid;
-  grid-template-columns: 120px repeat(auto-fill, minmax(44px, 1fr));
+  /* grid-template-columns set dynamically in JS */
   gap: 2px;
   font-size: 0.8rem;
 }
@@ -337,11 +337,20 @@
 
 .analytics-heatmap-col-header,
 .analytics-heatmap-row-header {
-  padding: 0.35rem 0.5rem;
-  background: #f3f4f6;
-  font-weight: 500;
-  color: #374151;
+  padding: 0.35rem 0.6rem;
+  background: #f1f5f9;
+  font-weight: 600;
+  color: #475569;
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 4px;
+}
+
+.analytics-heatmap-row-header {
+  text-align: left;
+  border-left: 3px solid #cbd5e1;
 }
 
 .analytics-heatmap-cell {

@@ -20,8 +20,9 @@ export default function Login() {
       const { data } = await axiosInstance.post('/auth/login', {
         email,
         password,
+        role: 'teacher',
       });
-      login(data.token, data.teacher);
+      login(data.token, data.user);
       navigate('/dashboard', { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
@@ -63,9 +64,9 @@ export default function Login() {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-        <p className="auth-switch">
+        {/* <p className="auth-switch">
           Don&apos;t have an account? <Link to="/register">Register</Link>
-        </p>
+        </p> */}
       </div>
     </div>
   );

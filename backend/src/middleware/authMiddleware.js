@@ -11,11 +11,24 @@ const authMiddleware = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    req.user = decoded; // { id, name, email, role }
     next();
   } catch (error) {
     return res.status(401).json({ message: 'Unauthorized - Invalid token' });
   }
 };
+
+const requireRole = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({ message: 'Forbidden: Access denied for this role' });
+    }
+    next();
+  };
+};
+
+// Export as both a function (legacy) and an object (modern)
+authMiddleware.authMiddleware = authMiddleware;
+authMiddleware.requireRole = requireRole;
 
 module.exports = authMiddleware;

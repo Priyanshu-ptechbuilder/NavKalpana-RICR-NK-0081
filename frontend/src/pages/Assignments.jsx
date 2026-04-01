@@ -88,7 +88,8 @@ export default function Assignments() {
   const submissionsByAssignment = useMemo(() => {
     const map = {};
     submissions.forEach((s) => {
-      const aid = typeof s.assignment === 'object' ? s.assignment._id : s.assignment;
+      const aid = typeof s.assignment === 'object' ? s.assignment?._id : s.assignment;
+      if (!aid) return;
       if (!map[aid]) map[aid] = [];
       map[aid].push(s);
     });
@@ -135,7 +136,9 @@ export default function Assignments() {
 
   const lessons = useMemo(() => {
     const set = new Set();
-    assignments.forEach((a) => a.lesson && set.add(a.lesson));
+    assignments.forEach((a) => {
+      if (a && a.lesson) set.add(a.lesson);
+    });
     return Array.from(set).sort();
   }, [assignments]);
 
@@ -253,7 +256,8 @@ export default function Assignments() {
       setEvaluateStudents(studentList);
       const rows = {};
       subList.forEach((s) => {
-        const sid = typeof s.student === 'object' ? s.student._id : s.student;
+        const sid = typeof s.student === 'object' ? s.student?._id : s.student;
+        if (!sid) return;
         rows[sid] = { submissionId: s._id, marksObtained: s.marksObtained, feedback: s.feedback || '', submittedAt: s.submittedAt };
       });
       studentList.forEach((st) => {
@@ -297,7 +301,8 @@ export default function Assignments() {
       setEvaluateSubmissions(Array.isArray(data) ? data : []);
       const rows = {};
       (Array.isArray(data) ? data : []).forEach((s) => {
-        const sid = typeof s.student === 'object' ? s.student._id : s.student;
+        const sid = typeof s.student === 'object' ? s.student?._id : s.student;
+        if (!sid) return;
         rows[sid] = { submissionId: s._id, marksObtained: s.marksObtained, feedback: s.feedback || '', submittedAt: s.submittedAt };
       });
       evaluateStudents.forEach((st) => {

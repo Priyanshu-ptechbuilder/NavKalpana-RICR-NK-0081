@@ -1,21 +1,35 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 
 const AuthContext = createContext(null);
 
+function parseJwt(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      window.atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem('token') || null);
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
+  const [user, setUser] = useState(() => {
     const stored = localStorage.getItem('user');
-    if (stored) {
-      try {
-        setUser(JSON.parse(stored));
-      } catch (_) {
-        setUser(null);
-      }
-    }
-  }, []);
+    return stored ? JSON.parse(stored) : null;
+  });
+
+  const role = useMemo(() => {
+    if (!token) return null;
+    const decoded = parseJwt(token);
+    return decoded?.role || null;
+  }, [token]);
 
   const login = (tokenValue, userData) => {
     setToken(tokenValue);
@@ -36,7 +50,15 @@ export function AuthProvider({ children }) {
     localStorage.setItem('user', JSON.stringify(userData || {}));
   };
 
-  const value = { token, user, login, logout, updateUser, isAuthenticated: !!token };
+  const value = { 
+    token, 
+    user, 
+    role, 
+    login, 
+    logout, 
+    updateUser, 
+    isAuthenticated: !!token 
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

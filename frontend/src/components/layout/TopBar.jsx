@@ -20,7 +20,7 @@ export default function TopBar() {
   const handleLogout = () => {
     setDropdownOpen(false);
     logout();
-    navigate('/login', { replace: true });
+    navigate('/teacher/login', { replace: true });
   };
 
   return (

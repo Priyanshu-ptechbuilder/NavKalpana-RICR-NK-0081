@@ -26,7 +26,10 @@ export default function AttendanceHeatmap({
   return (
     <div className="analytics-heatmap-wrap">
       {title && <h3 className="analytics-heatmap-title">{title}</h3>}
-      <div className="analytics-heatmap-grid">
+      <div 
+        className="analytics-heatmap-grid" 
+        style={{ gridTemplateColumns: `120px repeat(${cols.length}, minmax(44px, 1fr))` }}
+      >
         <div className="analytics-heatmap-corner" />
         {cols.map((c, j) => (
           <div key={j} className="analytics-heatmap-col-header">

@@ -5,13 +5,15 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const batchRoutes = require('./routes/batchRoutes');
-const studentRoutes = require('./routes/studentRoutes');
+const studentRoutes = require('./routes/studentMgmtRoutes');
 const attendanceRoutes = require('./routes/attendanceRoutes');
 const assignmentRoutes = require('./routes/assignmentRoutes');
 const submissionRoutes = require('./routes/submissionRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const quizAttemptRoutes = require('./routes/quizAttemptRoutes');
-const authMiddleware = require('./middleware/authMiddleware');
+const { authMiddleware } = require('./middleware/authMiddleware');
+const adminRoutes = require('./routes/adminRoutes');
+const studentPanelRoutes = require('./routes/studentRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -34,6 +36,8 @@ app.use('/api/assignments', assignmentRoutes);
 app.use('/api/submissions', submissionRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/quiz-attempts', quizAttemptRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/student', studentPanelRoutes);
 
 app.get('/api/protected', authMiddleware, (req, res) => {
   res.json({

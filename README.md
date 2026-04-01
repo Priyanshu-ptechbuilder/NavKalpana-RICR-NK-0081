@@ -1,242 +1,106 @@
-<<<<<<< HEAD
-📚 Academic Operations and Management Portal -- (Teacher Module – Part 1)
+# NavKalpana Academic Management Portal (Multi-Role)
 
-Project Title
+A comprehensive, secure, and centralized academic management system built with the MERN stack. This portal facilitates seamless interaction between Administrators, Teachers, and Students, streamlining academic operations from batch management to interactive learning.
 
-Academic Operations and Management Portal – Teacher Module
+## 🚀 Recent Updates: Role-Based Access Control (RBAC)
+The portal has been upgraded from a teacher-only system to a robust multi-role ecosystem:
+- **Admin**: Full system control, faculty & student lifecycle management.
+- **Teacher**: Academic delivery, attendance, assignments, and quizzes.
+- **Student**: Interactive learning, attendance tracking, and performance analytics.
 
+---
 
-👥 Team Members & Roles
+## 🛠 Tech Stack
+- **Frontend**: React.js (Vite), Tailwind CSS, Recharts, Lucide React, React Hot Toast.
+- **Backend**: Node.js, Express.js.
+- **Database**: MongoDB (Mongoose).
+- **Security**: JWT Authentication, Bcrypt Password Hashing, Role-Based Middleware.
 
-| Name | Role | Responsibilities |
-|------|------|-----------------|
-| Team Member 1 | Backend Developer | API, Database, Authentication |
-| Team Member 2 | Frontend Developer | UI, Components, Integration |
-| Team Member 3 | Database & Logic | Schema Design, Data Flow |
-| Team Member 4 | Testing & Documentation | Testing, Docs, Deployment |
+---
 
-📖 Problem Statement
+## 🔐 Credentials & Role Gates
 
-Teachers often manage academic activities manually or across multiple disconnected platforms.  
-This leads to:
+| Role | Access URL | Default Login | Initial Password |
+| :--- | :--- | :--- | :--- |
+| **Admin** | `/admin/login` | `admin@navkalpana.com` | `admin123` |
+| **Teacher** | `/teacher/login` | *Created by Admin* | *Set by Admin* |
+| **Student** | `/student/login` | *Created by Admin* | *Set by Admin* |
 
-- Poor tracking of attendance  
-- Difficulty in evaluating assignments  
-- Lack of centralized student performance monitoring  
-- No structured batch management  
+---
 
-This project aims to build a **secure and centralized academic management portal** where teachers can:
+## 📂 Key Module Breakdown
 
-- Manage batches  
-- Track attendance  
-- Create and evaluate assignments & quizzes  
-- Monitor student progress  
-- Handle support requests  
+### 1. Admin Control Center (Violet Theme)
+- **Teacher Management**: Full CRUD operations for faculty members.
+- **Student Lifecycle**: Onboarding students and mapping them to batches.
+- **System Health**: Overview of total users and system status.
 
+### 2. Teacher Portal (Indigo Theme)
+- **Batch Management**: Progress tracking and schedule monitoring.
+- **Attendance**: Marking student presence with mandatory remarks and history logs.
+- **Assessments**: Creation and evaluation of MCQ Quizzes and Digital Assignments.
 
-🎯 Objective
+### 3. Student Panel (Emerald Theme)
+- **Dashboard**: Real-time stats and upcoming academic deadlines.
+- **Attendance Registry**: Personal attendance calendar with performance summaries.
+- **Assessment Gateway**: Interactive quiz attempt mode and assignment submission logs.
+- **Competence Matrix**: Visual analytics of academic growth using trend line charts.
 
-To create a structured and scalable system that:
+---
 
-- Provides secure authentication
-- Allows structured academic management
-- Tracks student performance effectively
-- Improves academic monitoring and reporting
+## ⚙️ Installation & Setup
 
-
-🛠 Tech Stack Used
-
-### Frontend
-- React.js
-- Vite
-- CSS / Tailwind (if used)
-
-### Backend
-- Node.js
-- Express.js
-
-### Database
-- MongoDB
-
-### Authentication
-- JWT (JSON Web Token)
-- Bcrypt (Password Hashing)
-
-
-🔐 Core Features Implemented (Part 1)
-
-1️⃣ Authentication Module
-- Email & Password Login
-- Role-based Access (Teacher)
-- JWT Session Handling
-- Password Hashing
-- Logout Functionality
-
-2️⃣ Dashboard
-- Total Students
-- Active Courses
-- Pending Assignments
-- Upcoming Deadlines
-- Quick Navigation
-
-3️⃣ Batch Management
-- Batch Cards
-- Progress Tracking
-- Status (Ongoing / Completed / Upcoming)
-- Batch Filtering
-- Attendance Management
-
-4️⃣ Attendance Management
-- Mark Attendance
-- Remarks (Mandatory)
-- Edit within allowed time
-- Attendance History
-- Export Option
-- Calendar View
-- Present / Absent / Late Classification
-
-5️⃣ Assessment Management
-Assignment Module
-- Create Assignment
-- Set Deadline
-- Upload Instructions
-- Evaluate Submissions
-- Marks & Feedback
-- Status Tracking
-
-Quiz Module
-- Create MCQ Quiz
-- Set Duration
-- Attempt Limits
-- View Scores
-- Class Average
-
-6️⃣ Student Management
-- Search & Filter Students
-- Student Detail Modal
-- Progress Tracking
-- Attendance Summary
-- Performance Monitoring
-
-7️⃣ Support Requests
-- View Doubts
-- Filter by Course
-- Reply to Queries
-- Upload Solution Files
-- Mark as Resolved
-
-📂 Project Folder Structure
-
-
-
-NavKalpana-RICR-0081/
-│
-├── frontend/
-├── backend/
-├── docs/
-│   ├── problem-statement.pdf
-│   ├── architecture-diagram.png
-│   ├── api-documentation.md
-│   └── presentation.pptx
-│
-├── README.md
-└── .gitignore
-
-
-
-⚙ Installation Steps
-
-1️⃣ Clone Repository
-
-
-
+### 1. Clone & Dependencies
+```bash
 git clone https://github.com/Priyanshu-ptechbuilder/NavKalpana-RICR-NK-0081.git
 cd NavKalpana-RICR-NK-0081
-
 ```
 
-2️⃣ Backend Setup
-
-```
-
+### 2. Backend Initialization
+```bash
 cd backend
 npm install
+# Configure .env with MONGO_URI and JWT_SECRET
 npm run dev
-
 ```
 
-3️⃣ Frontend Setup
-
+### 3. Database Seeding (Required for Admin Access)
+```bash
+# Run from the backend directory
+node src/seed/adminSeed.js
 ```
 
+### 4. Frontend Initialization
+```bash
 cd frontend
 npm install
 npm run dev
-
-
----
-
-🔌 API Endpoints (Basic Overview)
-
-| Method | Endpoint | Description |
-|--------|----------|------------|
-| POST | /api/auth/login | Teacher Login |
-| GET | /api/dashboard | Dashboard Data |
-| GET | /api/batches | Get All Batches |
-| POST | /api/attendance | Mark Attendance |
-| POST | /api/assignments | Create Assignment |
-| POST | /api/quizzes | Create Quiz |
-| GET | /api/students | Get Student List |
-| GET | /api/support | Get Support Requests |
-
-*(Detailed documentation available in docs/api-documentation.md)*
-
-
-📊 Future Improvements
-
-- Part 2 – Advanced Analytics & Growth Intelligence
-- AI-based Performance Insights
-- Automatic Low-Performance Alerts
-- Role Expansion (Admin / Student)
-- Real-time Notifications
-- Deployment on AWS / Render / Vercel
-- Email Notification System
-- Advanced Report Export (PDF)
+```
 
 ---
 
-🧠 Innovation Aspect
-
-This system improves academic operations by:
-
-- Centralizing management
-- Automating evaluation tracking
-- Providing structured student monitoring
-- Supporting scalable academic growth
-
----
-
-🚀 Deployment (Planned)
-
-- Frontend: Vercel / Netlify
-- Backend: Render / AWS
-- Database: MongoDB Atlas
+## 📂 Improved File Structure
+```text
+NavKalpana-RICR-NK-0081/
+├── backend/src/
+│   ├── models/ (Student, Teacher, Batch, Quiz, etc.)
+│   ├── routes/ (adminRoutes, studentRoutes, authRoutes, etc.)
+│   ├── controllers/ (adminController, studentController, etc.)
+│   └── seed/ (adminSeed.js)
+└── frontend/src/
+    ├── auth/ (AdminLogin, StudentLogin)
+    ├── admin/ (AdminLayout, AdminDashboard, Teachers, Students)
+    ├── student/ (StudentLayout, Dashboard, Attendance, Quizzes, etc.)
+    └── components/ (ProtectedRoute, Layouts)
+```
 
 ---
 
-📌 Notes
-
-- Dummy data is used where required.
-- Code follows modular and clean structure.
-- All commits are meaningful and structured.
-- Each team member contributes individually.
+## 📊 Evaluation & Metrics
+- All dashboard values are derived from live MongoDB aggregations.
+- Performance charts utilize `recharts` for accurate visual representations.
+- Real-time feedback provided via `react-hot-toast`.
 
 ---
 
-📢 Final Statement
-
-This project is built with structured thinking, teamwork, and scalability in mind.  
-It reflects real academic management needs and provides a practical solution for faculty operations.
-
-
-⭐ Thank You
+⭐ **Project handled by Senior MERN Stack Team.**

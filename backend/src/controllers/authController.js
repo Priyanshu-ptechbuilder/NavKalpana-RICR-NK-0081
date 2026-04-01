@@ -1,64 +1,42 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Teacher = require('../models/Teacher');
+const Student = require('../models/Student');
 
-// Register a new teacher
-const registerTeacher = async (req, res) => {
+// Login User (Teacher, Admin, or Student)
+const login = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { email, password, role } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Name, email and password are required' });
+    if (!email || !password || !role) {
+      return res.status(400).json({ message: 'Email, password and role are required' });
     }
 
-    const existingTeacher = await Teacher.findOne({ email });
-    if (existingTeacher) {
-      return res.status(400).json({ message: 'Teacher with this email already exists' });
+    let user;
+    if (role === 'teacher' || role === 'admin') {
+      user = await Teacher.findOne({ email });
+    } else if (role === 'student') {
+      user = await Student.findOne({ email });
+    } else {
+      return res.status(400).json({ message: 'Invalid role' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const teacher = await Teacher.create({
-      name,
-      email,
-      password: hashedPassword,
-    });
-
-    res.status(201).json({
-      message: 'Teacher registered successfully',
-      teacher: {
-        id: teacher._id,
-        name: teacher.name,
-        email: teacher.email,
-        role: teacher.role,
-      },
-    });
-  } catch (error) {
-    console.error('Register error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-// Login teacher
-const loginTeacher = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
-    }
-
-    const teacher = await Teacher.findOne({ email });
-    if (!teacher) {
+    if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    const isMatch = await bcrypt.compare(password, teacher.password);
+    // Verify role matches (especially for admin vs teacher who share the same collection)
+    if (user.role !== role) {
+      return res.status(403).json({ message: 'Access denied for this role' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     const token = jwt.sign(
-      { id: teacher._id, role: teacher.role },
+      { id: user._id, name: user.name, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -66,11 +44,11 @@ const loginTeacher = async (req, res) => {
     res.status(200).json({
       message: 'Login successful',
       token,
-      teacher: {
-        id: teacher._id,
-        name: teacher.name,
-        email: teacher.email,
-        role: teacher.role,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -79,19 +57,26 @@ const loginTeacher = async (req, res) => {
   }
 };
 
-// Get current teacher profile (protected)
+// Get current user profile (protected)
 const getMe = async (req, res) => {
   try {
-    const teacher = await Teacher.findById(req.user.id).select('-password');
-    if (!teacher) {
-      return res.status(404).json({ message: 'Teacher not found' });
+    let user;
+    if (req.user.role === 'teacher' || req.user.role === 'admin') {
+      user = await Teacher.findById(req.user.id).select('-password');
+    } else {
+      user = await Student.findById(req.user.id).select('-password');
     }
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     res.status(200).json({
-      teacher: {
-        id: teacher._id,
-        name: teacher.name,
-        email: teacher.email,
-        role: teacher.role,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -104,39 +89,48 @@ const getMe = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const { name, email, currentPassword, newPassword } = req.body;
-    const teacher = await Teacher.findById(req.user.id);
-    if (!teacher) {
-      return res.status(404).json({ message: 'Teacher not found' });
+    let user;
+    let Model;
+
+    if (req.user.role === 'teacher' || req.user.role === 'admin') {
+      Model = Teacher;
+    } else {
+      Model = Student;
     }
 
-    if (name != null && name.trim()) teacher.name = name.trim();
+    user = await Model.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (name != null && name.trim()) user.name = name.trim();
     if (email != null && email.trim()) {
-      const existing = await Teacher.findOne({ email: email.trim(), _id: { $ne: teacher._id } });
+      const existing = await Model.findOne({ email: email.trim(), _id: { $ne: user._id } });
       if (existing) {
         return res.status(400).json({ message: 'Email already in use by another account' });
       }
-      teacher.email = email.trim();
+      user.email = email.trim();
     }
 
     if (newPassword != null && newPassword.trim()) {
       if (!currentPassword) {
         return res.status(400).json({ message: 'Current password is required to set a new password' });
       }
-      const isMatch = await bcrypt.compare(currentPassword, teacher.password);
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
       if (!isMatch) {
         return res.status(400).json({ message: 'Current password is incorrect' });
       }
-      teacher.password = await bcrypt.hash(newPassword.trim(), 10);
+      user.password = await bcrypt.hash(newPassword.trim(), 10);
     }
 
-    await teacher.save();
+    await user.save();
     res.status(200).json({
       message: 'Profile updated successfully',
-      teacher: {
-        id: teacher._id,
-        name: teacher.name,
-        email: teacher.email,
-        role: teacher.role,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -146,8 +140,7 @@ const updateProfile = async (req, res) => {
 };
 
 module.exports = {
-  registerTeacher,
-  loginTeacher,
+  login,
   getMe,
   updateProfile,
 };
