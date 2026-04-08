@@ -7,7 +7,7 @@ export default function AdminStudents() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [studentForm, setStudentForm] = useState({ name: '', email: '', password: '', batchId: '', enrollmentNo: '', phone: '' });
+  const [studentForm, setStudentForm] = useState({ name: '', email: '', password: '', batchId: '', enrollmentNo: '', phone: '', course: '' });
 
   const fetchData = async () => {
     try {
@@ -36,7 +36,7 @@ export default function AdminStudents() {
       } else {
         await axiosInstance.post('/admin/students', studentForm);
       }
-      setStudentForm({ name: '', email: '', password: '', batchId: '', enrollmentNo: '', phone: '' });
+      setStudentForm({ name: '', email: '', password: '', batchId: '', enrollmentNo: '', phone: '', course: '' });
       setIsEditing(false);
       fetchData();
     } catch (err) {
@@ -114,6 +114,17 @@ export default function AdminStudents() {
             </div>
 
             <div className="space-y-1">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">Course</label>
+              <input
+                type="text"
+                value={studentForm.course}
+                onChange={(e) => setStudentForm({...studentForm, course: e.target.value})}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+                required
+              />
+            </div>
+
+            <div className="space-y-1">
               <label className="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">Academic Batch</label>
               <select
                 value={studentForm.batchId}
@@ -160,7 +171,7 @@ export default function AdminStudents() {
               {isEditing && (
                 <button 
                   type="button" 
-                  onClick={() => { setIsEditing(false); setStudentForm({ name: '', email: '', password: '', batchId: '', enrollmentNo: '', phone: '' }); }}
+                  onClick={() => { setIsEditing(false); setStudentForm({ name: '', email: '', password: '', batchId: '', enrollmentNo: '', phone: '', course: '' }); }}
                   className="w-full py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all"
                 >
                   Cancel Edit
@@ -191,6 +202,7 @@ export default function AdminStudents() {
                 <thead>
                   <tr className="bg-slate-50 text-slate-400 text-[10px] uppercase font-black tracking-[0.25em] border-b border-slate-100">
                     <th className="px-10 py-6">ID & Student</th>
+                    <th className="px-10 py-6">Course</th>
                     <th className="px-10 py-6">Assigned Batch</th>
                     <th className="px-10 py-6">Digital Reach</th>
                     <th className="px-10 py-6 text-center">Settings</th>
@@ -211,6 +223,11 @@ export default function AdminStudents() {
                         </div>
                       </td>
                       <td className="px-10 py-7">
+                        <div className="font-bold text-slate-700">
+                          {student.course || '—'}
+                        </div>
+                      </td>
+                      <td className="px-10 py-7">
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-sm font-black border border-slate-200">
                           📁 {student.batchId?.batchName || 'Unassigned'}
                         </div>
@@ -222,7 +239,7 @@ export default function AdminStudents() {
                       <td className="px-10 py-7">
                         <div className="flex items-center justify-center gap-3 opacity-30 group-hover:opacity-100 transition-opacity">
                           <button 
-                            onClick={() => { setIsEditing(true); setStudentForm({...student, password: '', batchId: student.batchId?._id || ''}); }}
+                            onClick={() => { setIsEditing(true); setStudentForm({...student, password: '', batchId: student.batchId?._id || '', course: student.course || ''}); }}
                             className="bg-white p-3 rounded-xl border border-slate-200 hover:border-emerald-500 hover:text-emerald-500 shadow-sm transition-all"
                           >
                             ✏️

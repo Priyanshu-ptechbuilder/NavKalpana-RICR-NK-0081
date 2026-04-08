@@ -140,6 +140,8 @@ export default function Students() {
   const [sortOrder, setSortOrder] = useState('asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [detailStudent, setDetailStudent] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editId, setEditId] = useState(null);
 
   const fetchBatches = async () => {
     try {
@@ -195,22 +197,44 @@ export default function Students() {
     setSubmitting(true);
     setError('');
     try {
-      await axiosInstance.post('/students', {
+      const payload = {
         name: form.name.trim(),
         email: form.email.trim(),
-        enrollmentId: form.enrollmentId.trim(),
+        enrollmentNo: form.enrollmentId.trim(),
         course: form.course.trim(),
         batch: form.batch,
-      });
+      };
+      
+      if (isEditing) {
+        await axiosInstance.put(`/students/${editId}`, payload);
+      } else {
+        await axiosInstance.post('/students', payload);
+      }
       setForm({ name: '', email: '', enrollmentId: '', course: '', batch: '' });
       setFormErrors({});
+      setIsEditing(false);
+      setEditId(null);
       fetchStudents();
     } catch (err) {
-      console.error('Create student error:', err);
-      setError(err.response?.data?.message || 'Failed to create student');
+      console.error('Save student error:', err);
+      setError(err.response?.data?.message || 'Failed to save student');
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleEditClick = (e, s) => {
+    e.stopPropagation();
+    setIsEditing(true);
+    setEditId(s._id);
+    setForm({
+      name: s.name,
+      email: s.email,
+      enrollmentId: s.enrollmentNo || '',
+      course: s.course || '',
+      batch: s.batchId?._id || '',
+    });
+    setFormErrors({});
   };
 
   const handleDelete = async (e, id) => {
@@ -238,8 +262,8 @@ export default function Students() {
         return sortOrder === 'asc' ? va - vb : vb - va;
       }
       if (sortBy === 'batch') {
-        va = a.batch?.batchName ?? '';
-        vb = b.batch?.batchName ?? '';
+        va = a.batchId?.batchName ?? '';
+        vb = b.batchId?.batchName ?? '';
       } else {
         va = String(va ?? '').toLowerCase();
         vb = String(vb ?? '').toLowerCase();
@@ -273,7 +297,7 @@ export default function Students() {
   const getEnrolledModules = (s) => {
     const tags = [];
     if (s.course) tags.push(s.course);
-    if (s.batch?.batchName) tags.push(s.batch.batchName);
+    if (s.batchId?.batchName) tags.push(s.batchId.batchName);
     return tags.length ? tags : ['—'];
   };
 
@@ -297,7 +321,7 @@ export default function Students() {
       </section>
 
       <section className="students-section student-form-section">
-        <h2>Create Student</h2>
+        <h2>{isEditing ? 'Update Student' : 'Create Student'}</h2>
         <form onSubmit={handleSubmit} className="student-form">
           <label>
             Name
@@ -354,9 +378,25 @@ export default function Students() {
             </select>
             {formErrors.batch && <span className="field-error">{formErrors.batch}</span>}
           </label>
-          <button type="submit" disabled={submitting}>
-            {submitting ? 'Adding...' : 'Add Student'}
-          </button>
+          <div className="form-actions" style={{ display: 'flex', gap: '10px' }}>
+            <button type="submit" disabled={submitting}>
+              {submitting ? 'Saving...' : (isEditing ? 'Update Student' : 'Add Student')}
+            </button>
+            {isEditing && (
+              <button 
+                type="button" 
+                onClick={() => {
+                  setIsEditing(false);
+                  setEditId(null);
+                  setForm({ name: '', email: '', enrollmentId: '', course: '', batch: '' });
+                  setFormErrors({});
+                }}
+                style={{ backgroundColor: '#ccc' }}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
         </form>
       </section>
 
@@ -453,7 +493,7 @@ export default function Students() {
                         </div>
                       </td>
                       <td><strong>{s.name}</strong></td>
-                      <td>{s.enrollmentId}</td>
+                      <td>{s.enrollmentNo || s.enrollmentId}</td>
                       <td>{s.course}</td>
                       <td>
                         <div className="module-tags">
@@ -477,13 +517,23 @@ export default function Students() {
                         </span>
                       </td>
                       <td>
-                        <button
-                          type="button"
-                          className="btn-delete"
-                          onClick={(e) => handleDelete(e, s._id)}
-                        >
-                          Delete
-                        </button>
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                          <button
+                            type="button"
+                            className="btn-edit"
+                            style={{ backgroundColor: '#2196F3', color: 'white', padding: '5px 10px', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                            onClick={(e) => handleEditClick(e, s)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-delete"
+                            onClick={(e) => handleDelete(e, s._id)}
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

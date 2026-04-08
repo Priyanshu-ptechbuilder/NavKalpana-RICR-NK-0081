@@ -51,12 +51,12 @@ const deleteTeacher = async (req, res) => {
 // --- Students CRUD ---
 const createStudent = async (req, res) => {
   try {
-    const { name, email, password, batchId, enrollmentNo, phone } = req.body;
+    const { name, email, password, batchId, enrollmentNo, phone, course } = req.body;
     const existing = await Student.findOne({ email });
     if (existing) return res.status(400).json({ message: 'Student already exists' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const student = await Student.create({ name, email, password: hashedPassword, batchId, enrollmentNo, phone });
+    const student = await Student.create({ name, email, password: hashedPassword, batchId, enrollmentNo, phone, course });
     res.status(201).json(student);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -75,8 +75,8 @@ const getStudents = async (req, res) => {
 const updateStudent = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, password, batchId, enrollmentNo, phone } = req.body;
-    const updateData = { name, email, batchId, enrollmentNo, phone };
+    const { name, email, password, batchId, enrollmentNo, phone, course } = req.body;
+    const updateData = { name, email, batchId, enrollmentNo, phone, course };
     if (password) updateData.password = await bcrypt.hash(password, 10);
     const student = await Student.findByIdAndUpdate(id, updateData, { new: true }).select('-password');
     res.json(student);

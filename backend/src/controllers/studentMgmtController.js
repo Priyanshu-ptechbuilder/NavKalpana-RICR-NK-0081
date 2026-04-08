@@ -7,7 +7,8 @@ const Batch = require('../models/Batch');
  */
 const createStudent = async (req, res) => {
   try {
-    const { name, email, enrollmentNo, course, batch } = req.body;
+    const { name, email, course, batch } = req.body;
+    let enrollmentNo = req.body.enrollmentNo || req.body.enrollmentId;
 
     if (!name || !email || !enrollmentNo || !course || !batch) {
       return res.status(400).json({
@@ -24,6 +25,7 @@ const createStudent = async (req, res) => {
       name,
       email,
       enrollmentNo,
+      course,
       batchId: batch,
       password: await bcrypt.hash('Student@123', 10), // Default password if not provided
     });
@@ -117,6 +119,8 @@ const updateStudent = async (req, res) => {
       if (!batchExists) {
         return res.status(400).json({ message: 'Batch not found' });
       }
+      updates.batchId = updates.batch;
+      delete updates.batch;
     }
 
     const student = await Student.findByIdAndUpdate(

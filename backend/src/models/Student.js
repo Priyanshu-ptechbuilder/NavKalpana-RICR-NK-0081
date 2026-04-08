@@ -14,6 +14,10 @@ const studentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  course: {
+    type: String,
+    default: '',
+  },
   batchId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Batch',
