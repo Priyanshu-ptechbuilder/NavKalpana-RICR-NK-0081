@@ -113,13 +113,8 @@ export default function Attendance() {
     );
   }, [students, studentSearch]);
 
-  const canEditRow = (studentId) => {
-    const row = rowData[studentId];
-    if (!row || !row.attendanceId || !row.createdAt) return true;
-    const isToday = sessionDate === todayStr();
-    if (!isToday) return false;
-    const created = new Date(row.createdAt).getTime();
-    return Date.now() - created <= EDIT_WINDOW_MS;
+  const canEditRow = () => {
+    return sessionDate === todayStr();
   };
 
   const updateRow = (studentId, field, value) => {
@@ -141,7 +136,7 @@ export default function Attendance() {
         const status = r.status || 'present';
         const remarks = String(r.remarks || '').trim();
 
-        if (r.attendanceId && canEditRow(s._id)) {
+        if (r.attendanceId && canEditRow()) {
           return axiosInstance.put(`/attendance/${r.attendanceId}`, { status, remarks }).catch(e => {
             console.error(`Error updating student ${s.name}:`, e);
             throw e;
@@ -334,10 +329,10 @@ export default function Attendance() {
             <div className="table-header-row">
               <h2>Attendance</h2>
               <div className="table-actions">
-                <button type="button" className="btn-secondary" onClick={() => handleBulkStatus('present')}>
+                <button type="button" className="btn-secondary" onClick={() => handleBulkStatus('present')} disabled={sessionDate !== todayStr()}>
                   Mark all Present
                 </button>
-                <button type="button" className="btn-secondary" onClick={() => handleBulkStatus('absent')}>
+                <button type="button" className="btn-secondary" onClick={() => handleBulkStatus('absent')} disabled={sessionDate !== todayStr()}>
                   Mark all Absent
                 </button>
                 <button type="button" className="btn-export" onClick={handleExportCSV}>
@@ -368,14 +363,36 @@ export default function Attendance() {
                     <tbody>
                       {filteredStudents.map((s) => {
                         const r = rowData[s._id] || { status: 'present', remarks: '' };
-                        const editable = canEditRow(s._id);
+                        const editable = canEditRow();
+                        
+                        let badgeChar = '—';
+                        let badgeBg = '#ef4444'; // Red default for unmanaged
+                        
+                        if (r.attendanceId) {
+                          if (r.status === 'present') { badgeChar = 'P'; badgeBg = '#10b981'; } // green
+                          else if (r.status === 'absent') { badgeChar = 'A'; badgeBg = '#ef4444'; } // red
+                          else if (r.status === 'late') { badgeChar = 'L'; badgeBg = '#f59e0b'; } // yellow
+                        }
+
                         return (
                           <tr key={s._id}>
                             <td>{s.name}</td>
                             <td>{s.enrollmentNo || s.enrollmentId}</td>
                             <td>
-                              <span className={`attendance-pct ${getAttendanceClass(s.attendancePercentage)}`}>
-                                {s.attendancePercentage != null ? `${s.attendancePercentage}%` : '—'}
+                              <span 
+                                className="attendance-pct"
+                                style={{
+                                  backgroundColor: badgeBg,
+                                  color: '#ffffff',
+                                  padding: '4px 12px',
+                                  borderRadius: '6px',
+                                  display: 'inline-block',
+                                  minWidth: '35px',
+                                  textAlign: 'center',
+                                  fontWeight: 'bold'
+                                }}
+                              >
+                                {badgeChar}
                               </span>
                             </td>
                             <td>
@@ -407,7 +424,7 @@ export default function Attendance() {
                   </table>
                 </div>
                 <div className="submit-row">
-                  <button type="submit" disabled={submitting} className="btn-submit">
+                  <button type="submit" disabled={submitting || sessionDate !== todayStr()} className="btn-submit">
                     {submitting ? 'Saving...' : 'Save Attendance'}
                   </button>
                 </div>
