@@ -9,6 +9,23 @@ const connectDB = async () => {
   try {
     await mongoose.connect(uri);
     console.log('MongoDB Connected Successfully');
+
+    // Automatically drop legacy index if it exists to prevent E11000 duplicate key errors
+    try {
+      const db = mongoose.connection.db;
+      const collections = await db.collections();
+      const studentsCol = collections.find(c => c.collectionName === 'students');
+      if (studentsCol) {
+        const indexes = await studentsCol.indexes();
+        if (indexes.find(i => i.name === 'enrollmentId_1')) {
+          await studentsCol.dropIndex('enrollmentId_1');
+          console.log('Dropped legacy enrollmentId_1 index from students collection');
+        }
+      }
+    } catch (indexError) {
+      console.log('Could not verify/drop legacy index:', indexError.message);
+    }
+
   } catch (error) {
     console.error('MongoDB Connection Error:', error.message);
     process.exit(1);
