@@ -135,23 +135,34 @@ export default function Attendance() {
     setSuccessMsg('');
     setSubmitting(true);
     try {
-      for (const s of filteredStudents) {
+      const savePromises = filteredStudents.map((s) => {
         const r = rowData[s._id];
-        if (!r) continue;
+        if (!r) return null;
         const status = r.status || 'present';
         const remarks = String(r.remarks || '').trim();
 
         if (r.attendanceId && canEditRow(s._id)) {
-          await axiosInstance.put(`/attendance/${r.attendanceId}`, { status, remarks });
+          return axiosInstance.put(`/attendance/${r.attendanceId}`, { status, remarks }).catch(e => {
+            console.error(`Error updating student ${s.name}:`, e);
+            throw e;
+          });
         } else if (!r.attendanceId) {
-          await axiosInstance.post('/attendance', {
+          return axiosInstance.post('/attendance', {
             student: s._id,
             batch: selectedBatch,
             date: sessionDate,
             status,
             remarks,
+          }).catch(e => {
+            console.error(`Error marking student ${s.name}:`, e);
+            throw e;
           });
         }
+        return null;
+      }).filter(Boolean);
+
+      if (savePromises.length > 0) {
+        await Promise.all(savePromises);
       }
       setError('');
       
