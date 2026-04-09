@@ -31,6 +31,7 @@ export default function Attendance() {
   const [rowData, setRowData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -59,6 +60,7 @@ export default function Attendance() {
     const fetch = async () => {
       setLoading(true);
       setError('');
+      setSuccessMsg('');
       try {
         const [studentsRes, attendanceRes] = await Promise.all([
           axiosInstance.get('/students', { params: { batch: selectedBatch } }),
@@ -107,7 +109,7 @@ export default function Attendance() {
     return students.filter(
       (s) =>
         (s.name || '').toLowerCase().includes(q) ||
-        (s.enrollmentId || '').toLowerCase().includes(q)
+        ((s.enrollmentNo || s.enrollmentId) || '').toLowerCase().includes(q)
     );
   }, [students, studentSearch]);
 
@@ -127,21 +129,10 @@ export default function Attendance() {
     }));
   };
 
-  const validateRemarks = () => {
-    for (const s of filteredStudents) {
-      const r = rowData[s._id];
-      if (!r || !String(r.remarks || '').trim()) return false;
-    }
-    return true;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateRemarks()) {
-      setError('Remarks are mandatory for every student before submission.');
-      return;
-    }
     setError('');
+    setSuccessMsg('');
     setSubmitting(true);
     try {
       for (const s of filteredStudents) {
@@ -163,9 +154,19 @@ export default function Attendance() {
         }
       }
       setError('');
-      const { data: attendanceList } = await axiosInstance.get('/attendance', {
-        params: { batch: selectedBatch, date: sessionDate },
-      });
+      
+      const [attendanceRes, studentsRes] = await Promise.all([
+        axiosInstance.get('/attendance', {
+          params: { batch: selectedBatch, date: sessionDate },
+        }),
+        axiosInstance.get('/students', {
+          params: { batch: selectedBatch },
+        })
+      ]);
+      const attendanceList = attendanceRes.data;
+      const studentList = Array.isArray(studentsRes.data) ? studentsRes.data : [];
+      setStudents(studentList);
+      
       const byStudent = {};
       (attendanceList || []).forEach((a) => {
         const sid = typeof a.student === 'object' ? a.student._id : a.student;
@@ -187,6 +188,8 @@ export default function Attendance() {
         return next;
       });
       setExistingAttendance(attendanceList || []);
+      setSuccessMsg('Attendance saved successfully!');
+      setTimeout(() => setSuccessMsg(''), 5000);
     } catch (err) {
       console.error('Submit attendance error:', err);
       setError(err.response?.data?.message || 'Failed to save attendance');
@@ -210,7 +213,7 @@ export default function Attendance() {
     const rows = filteredStudents.map((s) => {
       const r = rowData[s._id] || {};
       const pct = s.attendancePercentage != null ? `${s.attendancePercentage}%` : '—';
-      return [s.name, s.enrollmentId, pct, r.status || '', r.remarks || ''];
+      return [s.name, s.enrollmentNo || s.enrollmentId, pct, r.status || '', r.remarks || ''];
     });
     return [headers, ...rows];
   };
@@ -335,6 +338,7 @@ export default function Attendance() {
               </div>
             </div>
             {error && <p className="attendance-error">{error}</p>}
+            {successMsg && <p className="attendance-success" style={{ color: '#10b981', fontWeight: 'bold', padding: '10px', backgroundColor: '#ecfdf5', borderRadius: '8px', marginBottom: '15px' }}>{successMsg}</p>}
             {filteredStudents.length === 0 ? (
               <p className="attendance-empty">No students in this batch.</p>
             ) : (
@@ -357,7 +361,7 @@ export default function Attendance() {
                         return (
                           <tr key={s._id}>
                             <td>{s.name}</td>
-                            <td>{s.enrollmentId}</td>
+                            <td>{s.enrollmentNo || s.enrollmentId}</td>
                             <td>
                               <span className={`attendance-pct ${getAttendanceClass(s.attendancePercentage)}`}>
                                 {s.attendancePercentage != null ? `${s.attendancePercentage}%` : '—'}
@@ -380,7 +384,7 @@ export default function Attendance() {
                                 type="text"
                                 value={r.remarks || ''}
                                 onChange={(e) => updateRow(s._id, 'remarks', e.target.value)}
-                                placeholder="Remarks (required)"
+                                placeholder="Remarks (optional)"
                                 disabled={!editable}
                                 className="remarks-input"
                               />

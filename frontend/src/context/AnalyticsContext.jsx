@@ -104,7 +104,7 @@ export function AnalyticsProvider({ children }) {
     },
     getFilteredStudents: () => {
       let list = [...students];
-      if (filters.batch) list = list.filter((s) => s.batch?._id === filters.batch || s.batch === filters.batch);
+      if (filters.batch) list = list.filter((s) => s.batchId?._id === filters.batch || s.batchId === filters.batch);
       if (filters.course) list = list.filter((s) => s.course === filters.course);
       if (filters.studentSearch) {
         const q = filters.studentSearch.toLowerCase();

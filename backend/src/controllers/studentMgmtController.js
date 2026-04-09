@@ -64,7 +64,7 @@ const getAllStudents = async (req, res) => {
     }
 
     if (batch) {
-      filter.batch = batch;
+      filter.batchId = batch;
     }
 
     if (search) {
